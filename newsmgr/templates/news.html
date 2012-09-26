@@ -1,0 +1,40 @@
+{% include 'newsmgr/templates/header.html' %}
+
+    <div id='alter-list'>
+        <a  href='#' class='add-links'>Why don't you add a link? [+]</a>
+        <div id='alter-list-form'>
+            <form name='add-link-form' action='addnew/' method='POST'>
+            {% csrf_token %}
+                <label for="ilink" id="ilink_label">Link</label>
+                <input type="text" name="ilink" id="ilink" size="300" value="" placeholder='Just paste your link here and let Cloudorite happens' class="text-input" />
+                <label for="ititle" id="ititle_label">Title</label>
+                <input type="text" name="ititle" id="itittle" size="300" value='' placeholder='Filled automagically, but maybe we could use some help...' class='text-input'/>
+                <label for="itags" id="itags">Tags</label>
+                <input type="text" name="itags" id="itags" size="300" value='' placeholder='We cloudorite the tags, but have a look just in case.' class='text-input'/>
+                <input type="submit" value="Submit" />
+            </form>
+        </div> 
+    </div>
+    <div class='link-list'>
+
+{% if latest_news %}
+    <ul>
+    {% for new in latest_news %}
+        <li>
+            <div class='item-link'>
+                <span class='item-link-id'>#{{ forloop.counter }}</span>
+                <a href='{{ new.url }}' class='item-link-title' target='_blank'>{{ new.title }}</a>
+                <span class='item-link-host'> ( {{ new.host }} )</span>
+                <span class='item-link-votes'>{{ new.votes }} votes </span>
+                <span class='item-link-user'>by {{ new.user }} </span>
+                <a href='/news/{{ new.id }}' class='item-link-comment'> | {{ ncomments }} comments.</a>
+            </div>
+        </li>
+    {% endfor %}
+    </ul>
+{% else %}
+        <span class='no-links'>No links are available. =(</span>
+{% endif %}
+    </div> <!-- link list -->
+{% include 'newsmgr/templates/footer.html' %}
+

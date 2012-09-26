@@ -1,0 +1,14 @@
+{% load dajaxice_templatetags %}
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN">
+<html lang="en">
+<head>
+    <title> {{ page_title }}</title>
+    {% block headIncludes %}{% endblock %}
+    {% dajaxice_js_import %}
+</head>
+<body>
+    {% block body_hdr %}{% endblock %}
+    <div class='content'>
+    {% block content %}{% endblock %}
+
