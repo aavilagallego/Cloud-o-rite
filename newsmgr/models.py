@@ -6,13 +6,26 @@ from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 
 # Create your models here.
-class SocialNetworks
+class SocialNetworks(models.Model):
+    name     = models.CharField(max_length=20)
+    link     = models.CharField(max_length=150)
+    username = models.CharField(max_length=30)
+
 class WebRoles(models.Model):
     role     = models.CharField(max_length=20, unique=True)
     desc     = models.CharField(max_length=300)
 
+class UsersIp(models.Model):
+    date = models.DateTimeField('Date Used')
+    ip   = models.CharField(max_length=45)
+
+class Clans(models.Model):
+    group    = models.CharField(max_length=20, unique=True)
+    desc     = models.CharField(max_length=300)
+    logo     = models.ImageField(upload_to='groups', null=True, blank=True)
+
 class Users(models.Model):
-    user = models.OneToOneField(User)
+    user     = models.OneToOneField(User)
     exp      = models.IntegerField()
     web      = models.CharField(max_length=150, null=True, blank=True)
     avatar   = models.ImageField(upload_to='avatars', null=True, blank=True)
@@ -21,28 +34,11 @@ class Users(models.Model):
     ips      = models.ManyToManyField(UsersIp)
     clan     = models.ForeignKey(Clans, null=True, blank=True)
 
-
-class Clans(models.Model):
-    group    = models.CharField(max_length=20, unique=True)
-    desc     = models.CharField(max_length=300)
-    logo     = models.ImageField(upload_to='groups', null=True, blank=True)
-
 class Powers(models.Model):
     power    = models.CharField(max_length=25, unique=True)
     desc     = models.CharField(max_length=150, null=True, blank=True)
     image    = models.ImageField(upload_to='powerups')
 
-class ReadyPowers(models.Model):
-    power = ForeignKey(Powers)
-    user  = ForeignKey(Users)
-    link  = ForeignKey(Links, null=True, blank=True)
-    oDate = models.DateTimeField('Given Date')
-    uDate = models.DateTimeField('Used Date')
-
-
-class UsersIp(models.Model):
-    date = models.DateTimeField('Date Used')
-    ip   = models.CharField(max_length=45)
 
 class Messages(models.Model):
     userFrom = models.ForeignKey(Users, related_name='userf')
@@ -51,14 +47,23 @@ class Messages(models.Model):
     dateS = models.DateTimeField('Date Sent')
     dateR = models.DateTimeField('Date Readed', null=True, blank=True)
     spam  = models.ForeignKey(Users, null=True, blank=True)
-    rUserF = models.BooleanField(null=True, blank=True)
-    fUserT = models.BooleanField(null=True, blank=True)
+    rUserF = models.NullBooleanField(null=True, blank=True)
+    fUserT = models.NullBooleanField(null=True, blank=True)
 
 class Shouts(models.Model):
-    user = models.ForeignKey(Users)
+    user = models.ForeignKey(Users, 'user')
     msg  = models.CharField(max_length='120')
     date = models.DateTimeField('Date Sent')
-    spam = models.ForeignKey(Users)
+    votes= models.ForeignKey(Users, 'id')
+    spam = models.ForeignKey(Users, 'id')
+
+class Tags(models.Model):
+    name = models.CharField(max_length=20, unique=True)
+    desc = models.CharField(max_length=150, null=True, blank=True)
+
+class NewsStatus(models.Model):
+    name = models.CharField(max_length=20, unique=True)
+    desc = models.CharField(max_length=300)
 
 class Links(models.Model):
     url    = models.CharField(max_length=300, unique=True)
@@ -69,14 +74,18 @@ class Links(models.Model):
     uvotes = models.ManyToManyField(Users, null=True, blank=True)
     avotes = models.ManyToManyField(UsersIp, null=True, blank=True)
     spam   = models.ManyToManyField(Users, null=True, blank=True)
-    user   = models.ForeignKey(Users)
+    user   = models.ForeignKey(Users, 'id')
     status = models.ForeignKey(NewsStatus)
     via    = models.CharField(max_length=100, null=True, blank=True)
     tags   = models.ManyToManyField(Tags)
 
-class NewsStatus(models.Model):
-    name = models.CharField(max_length=20, unique=True)
-    desc = models.CharField(max_length=300)
+class ReadyPowers(models.Model):
+    power = models.ForeignKey(Powers)
+    user  = models.ForeignKey(Users)
+    link  = models.ForeignKey(Links, null=True, blank=True)
+    oDate = models.DateTimeField('Given Date')
+    uDate = models.DateTimeField('Used Date')
+
 
 
 class Comments(models.Model):
@@ -87,14 +96,11 @@ class Comments(models.Model):
     spam = models.ManyToManyField(Users, null=True, blank=True)
 
 
-class Tags(models.Model):
-    name = models.CharField(max_length=20, unique=True)
-    desc = models.CharField(max_length=150, null=True, blank=True)
 
 
 class Related(models.Model):
-    new1  = models.ForeignKey(News, related_name='new1')
-    new2  = models.ForeignKey(News, related_name='new2')
+    new1  = models.ForeignKey(Links, related_name='new1')
+    new2  = models.ForeignKey(Links, related_name='new2')
     user  = models.ForeignKey(Users)
     date  = models.DateTimeField('Date Added')
     score = models.IntegerField()
