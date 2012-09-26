@@ -13,7 +13,7 @@ class SocialNetworks(models.Model):
 
 class WebRoles(models.Model):
     role     = models.CharField(max_length=20, unique=True)
-    desc     = models.CharField(max_length=300)
+    desc     = models.CharField(max_length=255)
 
 class UsersIp(models.Model):
     date = models.DateTimeField('Date Used')
@@ -21,7 +21,7 @@ class UsersIp(models.Model):
 
 class Clans(models.Model):
     group    = models.CharField(max_length=20, unique=True)
-    desc     = models.CharField(max_length=300)
+    desc     = models.CharField(max_length=255)
     logo     = models.ImageField(upload_to='groups', null=True, blank=True)
 
 class Users(models.Model):
@@ -43,7 +43,7 @@ class Powers(models.Model):
 class Messages(models.Model):
     userFrom = models.ForeignKey(Users, related_name='userf')
     userTo   = models.ForeignKey(Users, related_name='usert')
-    msg      = models.CharField(max_length=300)
+    msg      = models.CharField(max_length=255)
     dateS = models.DateTimeField('Date Sent')
     dateR = models.DateTimeField('Date Readed', null=True, blank=True)
     spam  = models.ForeignKey(Users, null=True, blank=True)
@@ -51,11 +51,11 @@ class Messages(models.Model):
     fUserT = models.NullBooleanField(null=True, blank=True)
 
 class Shouts(models.Model):
-    user = models.ForeignKey(Users, 'user')
+    user = models.ForeignKey(Users, related_name='sent_user')
     msg  = models.CharField(max_length='120')
     date = models.DateTimeField('Date Sent')
-    votes= models.ForeignKey(Users, 'id')
-    spam = models.ForeignKey(Users, 'id')
+    votes= models.ForeignKey(Users, related_name='svoters')
+    spam = models.ForeignKey(Users, related_name='sreporters')
 
 class Tags(models.Model):
     name = models.CharField(max_length=20, unique=True)
@@ -63,18 +63,18 @@ class Tags(models.Model):
 
 class NewsStatus(models.Model):
     name = models.CharField(max_length=20, unique=True)
-    desc = models.CharField(max_length=300)
+    desc = models.CharField(max_length=255)
 
 class Links(models.Model):
-    url    = models.CharField(max_length=300, unique=True)
+    url    = models.CharField(max_length=255, unique=True)
     title  = models.CharField(max_length=100)
     desc   = models.CharField(max_length=500, null=True, blank=True)
     date   = models.DateTimeField('Date Added')
     datep  = models.DateTimeField('Date Published', null=True, blank=True)
-    uvotes = models.ManyToManyField(Users, null=True, blank=True)
-    avotes = models.ManyToManyField(UsersIp, null=True, blank=True)
-    spam   = models.ManyToManyField(Users, null=True, blank=True)
-    user   = models.ForeignKey(Users, 'id')
+    uvotes = models.ManyToManyField(Users, related_name='voters', null=True, blank=True)
+    avotes = models.ManyToManyField(UsersIp, related_name='avoters', null=True, blank=True)
+    spam   = models.ManyToManyField(Users, related_name='reporters', null=True, blank=True)
+    user   = models.ForeignKey(Users,  related_name='sender')
     status = models.ForeignKey(NewsStatus)
     via    = models.CharField(max_length=100, null=True, blank=True)
     tags   = models.ManyToManyField(Tags)
@@ -89,14 +89,11 @@ class ReadyPowers(models.Model):
 
 
 class Comments(models.Model):
-    user = models.ForeignKey(Users)
-    new  = models.ForeignKey(Links)
+    user = models.ForeignKey(Users, related_name='cuser')
+    link = models.ForeignKey(Links, related_name='comments_on')
     text = models.CharField(max_length=800)
-    votes= models.ManyToManyField(Users, null=True, blank=True)
-    spam = models.ManyToManyField(Users, null=True, blank=True)
-
-
-
+    votes= models.ManyToManyField(Users, related_name='cvoters', null=True, blank=True)
+    spam = models.ManyToManyField(Users, related_name='creporters', null=True, blank=True)
 
 class Related(models.Model):
     new1  = models.ForeignKey(Links, related_name='new1')
