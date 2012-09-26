@@ -1,12 +1,12 @@
 from django.template import Context, loader
 from django.http import HttpResponse
 from django.utils import simplejson
-from newsmgr.models import News, Users, Votes
+from newsmgr.models import Links, Users
 
 
 def voteForNew(request, newid, user ):
     u = Users.objects.get(name=user)
-    n = News.objects.get(id=newid)
+    n = Links.objects.get(id=newid)
     v = Votes(n.id, n.newid)
     v.save()
     n.votes = n.votes+1;
